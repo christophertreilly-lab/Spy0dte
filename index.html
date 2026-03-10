@@ -7,10 +7,12 @@
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
   <meta name="apple-mobile-web-app-title" content="SPY 0DTE"/>
+  <meta name="theme-color" content="#0d0d0d"/>
+  <link rel="manifest" href="manifest.json"/>
   <title>SPY 0DTE Signals</title>
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
-    body{background:#0d0d0d;color:#e8e8e8;font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;min-height:100vh}
+    body{background:#0d0d0d;color:#e8e8e8;font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;min-height:100vh;font-size:15px;-webkit-text-size-adjust:100%}
     .hdr{background:#111;border-bottom:1px solid #222;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
     .hdr-left{display:flex;align-items:center;gap:10px}
     .logo{width:30px;height:30px;background:linear-gradient(135deg,#00c853,#1a237e);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#fff}
@@ -54,7 +56,7 @@
 .signal-box.call .glow{background:linear-gradient(90deg,#00c853,transparent)}
 .signal-box.put .glow{background:linear-gradient(90deg,#ff5252,transparent)}
 .sig-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
-.sig-type{font-size:22px;font-weight:900;letter-spacing:.02em}
+.sig-type{font-size:24px;font-weight:900;letter-spacing:.02em}
 .sig-type.call{color:#00c853}
 .sig-type.put{color:#ff5252}
 .sig-type.wait{color:#555}
@@ -63,6 +65,9 @@
 .sig-badge.put{background:rgba(255,82,82,0.2);color:#ff5252}
 .sig-badge.wait{background:#1a1a1a;color:#555}
 .sig-badge.strong{background:rgba(0,200,83,0.35);color:#00e676;font-size:10px}
+.sig-badge.very-strong{background:linear-gradient(90deg,#ffd600,#ff6d00);color:#000;font-size:10px;animation:glow-badge 1.2s infinite alternate}
+.sig-badge.very-strong-put{background:linear-gradient(90deg,#ffd600,#ff6d00);color:#000;font-size:10px;animation:glow-badge 1.2s infinite alternate}
+@keyframes glow-badge{from{box-shadow:0 0 4px #ffd600}to{box-shadow:0 0 12px #ff6d00}}
 .sig-badge.strong-put{background:rgba(255,82,82,0.35);color:#ff5252}
 
 .price-levels{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px}
@@ -78,7 +83,20 @@
 .strike-val{font-size:16px;font-weight:700;color:#fff}
 .strike-detail{font-size:10px;color:#555;margin-top:2px}
 
-.sig-reason{font-size:11px;color:#888;line-height:1.7;border-top:1px solid #222;padding-top:12px}
+.sig-reason{font-size:13px;color:#999;line-height:1.8;border-top:1px solid #222;padding-top:12px}
+.plain-card{background:#1a1a1a;border-radius:12px;padding:13px 15px;margin-bottom:9px;display:flex;align-items:flex-start;gap:12px}
+.plain-icon{font-size:22px;flex-shrink:0;width:32px;text-align:center;margin-top:1px}
+.plain-label{font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;font-weight:600}
+.plain-verdict{font-size:15px;font-weight:700;margin-bottom:4px}
+.plain-explain{font-size:13px;color:#999;line-height:1.6}
+.plain-verdict.bull{color:#00c853}
+.plain-verdict.bear{color:#ff5252}
+.plain-verdict.neut{color:#aaa}
+.pcr-track{background:#222;border-radius:6px;height:10px;position:relative;margin:8px 0 4px;overflow:hidden}
+.pcr-fill{height:10px;border-radius:6px;transition:width .6s}
+.pcr-marker{position:absolute;top:-2px;bottom:-2px;width:2px;background:#fff;border-radius:1px}
+.flow-row{background:#1a1a1a;border-radius:10px;padding:10px 13px;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center}
+.flow-badge{font-size:9px;font-weight:700;padding:2px 8px;border-radius:100px;letter-spacing:.06em}
 .strikes-title{font-size:10px;color:#555;text-transform:uppercase;letter-spacing:.1em;margin:14px 0 8px;font-weight:600}
 .strike-row{display:flex;align-items:center;gap:10px;background:#1a1a1a;border-radius:10px;padding:10px 12px;margin-bottom:7px;position:relative;overflow:hidden}
 .strike-row .conf-bar{position:absolute;left:0;top:0;bottom:0;border-radius:10px;opacity:0.08;transition:width .6s}
@@ -211,72 +229,18 @@
     <div class="sig-reason" id="sig-reason"></div>
   </div>
 
-  <!-- INDICATORS -->
+  <!-- OPTIONS FLOW -->
+
+  <div class="indicators" id="flow-panel" style="display:none">
+    <div class="ind-title">💰 Options Flow (Smart Money)</div>
+    <div id="flow-body"></div>
+  </div>
+
+  <!-- PLAIN ENGLISH INDICATORS -->
 
   <div class="indicators">
-    <div class="ind-title">Live Indicators</div>
-    <div class="ind-grid">
-      <div class="ind-item">
-        <div class="ind-name">RSI (14)</div>
-        <div class="ind-val neut" id="ind-rsi">—</div>
-        <div class="ind-signal neut" id="ind-rsi-sig">loading</div>
-      </div>
-      <div class="ind-item">
-        <div class="ind-name">RSI Fast (5)</div>
-        <div class="ind-val neut" id="ind-rsi5">—</div>
-        <div class="ind-signal neut" id="ind-rsi5-sig">loading</div>
-      </div>
-      <div class="ind-item">
-        <div class="ind-name">EMA 9 vs 21</div>
-        <div class="ind-val neut" id="ind-ema">—</div>
-        <div class="ind-signal neut" id="ind-ema-sig">loading</div>
-      </div>
-      <div class="ind-item">
-        <div class="ind-name">MACD</div>
-        <div class="ind-val neut" id="ind-macd">—</div>
-        <div class="ind-signal neut" id="ind-macd-sig">loading</div>
-      </div>
-      <div class="ind-item">
-        <div class="ind-name">Bollinger</div>
-        <div class="ind-val neut" id="ind-bb">—</div>
-        <div class="ind-signal neut" id="ind-bb-sig">loading</div>
-      </div>
-      <div class="ind-item">
-        <div class="ind-name">Momentum (ROC)</div>
-        <div class="ind-val neut" id="ind-roc">—</div>
-        <div class="ind-signal neut" id="ind-roc-sig">loading</div>
-      </div>
-      <div class="ind-item">
-        <div class="ind-name">ORB</div>
-        <div class="ind-val neut" id="ind-orb">—</div>
-        <div class="ind-signal neut" id="ind-orb-sig">loading</div>
-      </div>
-      <div class="ind-item">
-        <div class="ind-name">Volume Ratio</div>
-        <div class="ind-val neut" id="ind-vol">—</div>
-        <div class="ind-signal neut" id="ind-vol-sig">loading</div>
-      </div>
-    </div>
-    <div id="ind-candle-row" style="margin-top:10px;display:none">
-      <div class="ind-item" style="background:#1a1a1a;border-radius:10px;padding:10px 12px">
-        <div class="ind-name">Candle Pattern</div>
-        <div class="ind-val neut" id="ind-candle">—</div>
-        <div class="ind-signal neut" id="ind-candle-sig">—</div>
-      </div>
-    </div>
-    <div class="vwap-bar">
-      <div class="vwap-row">
-        <span class="vwap-label">VWAP</span>
-        <span class="vwap-val" id="vwap-val">—</span>
-      </div>
-      <div class="vwap-row" style="margin-bottom:4px">
-        <span style="font-size:10px;color:#555">Price vs VWAP</span>
-        <span id="vwap-rel" style="font-size:10px;color:#555">—</span>
-      </div>
-      <div class="bar-track">
-        <div class="bar-fill" id="vwap-bar-fill" style="width:50%;background:#333"></div>
-      </div>
-    </div>
+    <div class="ind-title">📊 What The Market Is Saying Right Now</div>
+    <div id="plain-indicators"></div>
   </div>
 
   <!-- SIGNAL HISTORY -->
@@ -289,6 +253,12 @@
   <div class="settings-bar">
     <button onclick="fetchData()">🔄 Refresh Now</button>
     <button onclick="clearHistory()">🗑 Clear History</button>
+  </div>
+  <div id="notif-bar" style="background:#1a1a1a;border:1px solid #333;border-radius:12px;padding:14px 16px;margin-top:0;margin-bottom:14px;display:none">
+    <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:6px">🔔 Push Notifications</div>
+    <div id="notif-status" style="font-size:12px;color:#888;margin-bottom:10px">Tap below to get notified when a strong signal fires — even when your phone is locked.</div>
+    <div style="font-size:11px;color:#555;margin-bottom:10px">⚠️ Requires: iOS 16.4+ · App saved to Home Screen · Allow notifications when prompted</div>
+    <button id="notif-btn" onclick="requestNotifPermission()" style="width:100%;background:#00c853;color:#000;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer">Enable Notifications</button>
   </div>
 
 </div>
@@ -310,6 +280,8 @@ function saveKey() {
   document.getElementById('key-screen').style.display = 'none';
   document.getElementById('app').style.display = 'block';
   loadHistory();
+  registerServiceWorker();
+  initNotifications();
   fetchData();
   startAutoRefresh();
 }
@@ -690,7 +662,8 @@ function generateSignal(bars, currentPrice) {
 
   return {
     type: direction, strength: score, maxScore: MAX_SCORE, confPct,
-    strong: score >= 12,
+    strong: score >= 10,
+    veryStrong: score >= 15,
     strike: Math.round(currentPrice),
     entryPrice: entryPrice.toFixed(2),
     targetSPY:  targetSPY.toFixed(2),
@@ -770,6 +743,9 @@ async function fetchData() {
     // Update signal box
     updateSignalBox(sig, currentPrice);
 
+    // Fetch options flow (Put/Call ratio) in parallel - don't await so it doesn't block
+    fetchOptionsFlow(currentPrice);
+
     // Log to history if signal changed
     if (sig.type !== 'wait' && sig.type !== prevSignal) {
       signalHistory.unshift({
@@ -783,6 +759,7 @@ async function fetchData() {
       prevSignal = sig.type;
       saveHistory();
       renderHistory();
+      maybeNotify(sig);
     } else if (sig.type === 'wait') {
       prevSignal = null;
     }
@@ -803,160 +780,478 @@ async function fetchData() {
   }
 }
 
-function setInd(id, val, cls, sigId, sigTxt, sigCls) {
-  const el = document.getElementById(id); if (el) { el.textContent = val; el.className = 'ind-val ' + cls; }
-  const sl = document.getElementById(sigId); if (sl) { sl.textContent = sigTxt; sl.className = 'ind-signal ' + sigCls; }
+// ── OPTIONS FLOW: PUT/CALL RATIO ──
+async function fetchOptionsFlow(spyPrice) {
+  try {
+    const today = todayStr();
+    // Fetch SPY options snapshot - all contracts expiring today
+    const url = `${API_BASE}/v3/snapshot/options/SPY?expiration_date=${today}&limit=250&apiKey=${apiKey}`;
+    const res = await fetch(url, { method:'GET', headers:{'Accept':'application/json'}, mode:'cors' });
+    if (!res.ok) return; // silently skip if not available on this plan
+
+    const data = await res.json();
+    if (!data.results || data.results.length === 0) return;
+
+    let callVol = 0, putVol = 0;
+    let callOI = 0, putOI = 0;
+    let unusualCalls = [], unusualPuts = [];
+    let totalVols = [];
+
+    for (const opt of data.results) {
+      const d = opt.details || {};
+      const g = opt.greeks || {};
+      const dv = opt.day || {};
+      const type = d.contract_type;
+      const vol = dv.volume || 0;
+      const oi = opt.open_interest || 0;
+      const strike = d.strike_price || 0;
+
+      totalVols.push(vol);
+      if (type === 'call') { callVol += vol; callOI += oi; }
+      if (type === 'put')  { putVol  += vol; putOI  += oi; }
+    }
+
+    // Find unusual volume: options with vol > 3x their open interest (institutional activity)
+    const avgVol = totalVols.length ? totalVols.reduce((a,b) => a+b, 0) / totalVols.length : 0;
+    for (const opt of data.results) {
+      const d = opt.details || {};
+      const dv = opt.day || {};
+      const type = d.contract_type;
+      const vol = dv.volume || 0;
+      const oi = opt.open_interest || 1;
+      const strike = d.strike_price || 0;
+      if (vol > avgVol * 4 && vol > 500) {
+        const entry = { strike, vol, oi, ratio: vol/oi };
+        if (type === 'call') unusualCalls.push(entry);
+        if (type === 'put')  unusualPuts.push(entry);
+      }
+    }
+
+    unusualCalls.sort((a,b) => b.vol - a.vol);
+    unusualPuts.sort((a,b) => b.vol - a.vol);
+
+    renderOptionsFlow(callVol, putVol, callOI, putOI, unusualCalls.slice(0,3), unusualPuts.slice(0,3), spyPrice);
+  } catch(e) {
+    // Options flow is bonus data — fail silently
+    console.log('Options flow unavailable:', e.message);
+  }
+}
+
+function renderOptionsFlow(callVol, putVol, callOI, putOI, unusualCalls, unusualPuts, price) {
+  const panel = document.getElementById('flow-panel');
+  const body = document.getElementById('flow-body');
+  if (!panel || !body) return;
+
+  const totalVol = callVol + putVol;
+  if (totalVol === 0) return;
+
+  const pcr = putVol / (callVol || 1); // Put/Call ratio
+  const callPct = Math.round((callVol / totalVol) * 100);
+  const putPct = 100 - callPct;
+
+  // Plain English PCR interpretation
+  let pcrVerdict, pcrIcon, pcrCls, pcrExplain;
+  if (pcr < 0.6) {
+    pcrIcon = '🐂'; pcrCls = '#00c853'; 
+    pcrVerdict = 'Strong BULLISH flow — big money is buying CALLS';
+    pcrExplain = `${callPct}% of all SPY options traded today are CALLS. When this number is this high, institutions are betting on SPY going UP. This is a strong tailwind for CALL trades.`;
+  } else if (pcr < 0.8) {
+    pcrIcon = '📈'; pcrCls = '#69f0ae';
+    pcrVerdict = 'Leaning BULLISH — more calls than puts';
+    pcrExplain = `${callPct}% calls vs ${putPct}% puts today. Slightly more bullish bets being placed. Mild support for CALL trades.`;
+  } else if (pcr < 1.1) {
+    pcrIcon = '⚖️'; pcrCls = '#aaa';
+    pcrVerdict = 'Neutral — balanced between calls and puts';
+    pcrExplain = `${callPct}% calls vs ${putPct}% puts. The market is split — no clear institutional bias either direction. Rely on price action signals instead.`;
+  } else if (pcr < 1.4) {
+    pcrIcon = '📉'; pcrCls = '#ff8a80';
+    pcrVerdict = 'Leaning BEARISH — more puts than calls';
+    pcrExplain = `${putPct}% of options traded today are PUTS. Mild bearish bias from institutions. Mild support for PUT trades.`;
+  } else {
+    pcrIcon = '🐻'; pcrCls = '#ff5252';
+    pcrVerdict = 'Strong BEARISH flow — big money is buying PUTS';
+    pcrExplain = `${putPct}% of all SPY options traded today are PUTS. Institutions are heavily hedging or betting on SPY going DOWN. Strong tailwind for PUT trades.`;
+  }
+
+  // Bar visual: left=calls(green), right=puts(red)
+  let html = `
+    <div style="background:#111;border-radius:12px;padding:14px 16px;margin-bottom:10px">
+      <div style="font-size:13px;font-weight:700;color:${pcrCls};margin-bottom:4px">${pcrIcon} ${pcrVerdict}</div>
+      <div style="font-size:11px;color:#777;margin-bottom:12px">${pcrExplain}</div>
+
+      <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+        <span style="font-size:11px;color:#00c853">📈 CALLS ${callPct}%</span>
+        <span style="font-size:11px;color:#555">Put/Call Ratio: ${pcr.toFixed(2)}</span>
+        <span style="font-size:11px;color:#ff5252">PUTS ${putPct}% 📉</span>
+      </div>
+      <div class="pcr-track">
+        <div class="pcr-fill" style="width:${callPct}%;background:linear-gradient(90deg,#00c853,#69f0ae)"></div>
+        <div class="pcr-marker" style="left:50%"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:5px">
+        <span style="font-size:9px;color:#555">${(callVol/1000).toFixed(0)}K contracts</span>
+        <span style="font-size:9px;color:#555">↑ Bullish | Bearish ↓</span>
+        <span style="font-size:9px;color:#555">${(putVol/1000).toFixed(0)}K contracts</span>
+      </div>
+    </div>`;
+
+  // Unusual activity
+  const hasUnusual = unusualCalls.length > 0 || unusualPuts.length > 0;
+  if (hasUnusual) {
+    html += `<div style="font-size:11px;color:#555;text-transform:uppercase;letter-spacing:.07em;margin:10px 0 6px">🔥 Unusual Activity (Institutional Bets)</div>`;
+
+    for (const u of unusualCalls) {
+      const dist = ((u.strike - price) / price * 100).toFixed(1);
+      html += `<div class="flow-row">
+        <div>
+          <span style="color:#00c853;font-weight:700">CALL $${u.strike}</span>
+          <span style="color:#555;font-size:10px;margin-left:6px">${dist > 0 ? '+' : ''}${dist}% from price</span>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:12px;color:#fff">${(u.vol/1000).toFixed(1)}K contracts</div>
+          <div style="font-size:10px;color:#555">${u.ratio.toFixed(0)}× open interest</div>
+        </div>
+        <span class="flow-badge" style="background:#00c85322;color:#00c853">BULLISH BET</span>
+      </div>`;
+    }
+
+    for (const u of unusualPuts) {
+      const dist = ((u.strike - price) / price * 100).toFixed(1);
+      html += `<div class="flow-row">
+        <div>
+          <span style="color:#ff5252;font-weight:700">PUT $${u.strike}</span>
+          <span style="color:#555;font-size:10px;margin-left:6px">${dist > 0 ? '+' : ''}${dist}% from price</span>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:12px;color:#fff">${(u.vol/1000).toFixed(1)}K contracts</div>
+          <div style="font-size:10px;color:#555">${u.ratio.toFixed(0)}× open interest</div>
+        </div>
+        <span class="flow-badge" style="background:#ff525222;color:#ff5252">BEARISH BET</span>
+      </div>`;
+    }
+  }
+
+  body.innerHTML = html;
+  panel.style.display = 'block';
+}
+
+function plainCard(icon, label, verdict, verdictCls, explain) {
+  return `<div class="plain-card">
+    <div class="plain-icon">${icon}</div>
+    <div style="flex:1">
+      <div class="plain-label">${label}</div>
+      <div class="plain-verdict ${verdictCls}">${verdict}</div>
+      <div class="plain-explain">${explain}</div>
+    </div>
+  </div>`;
 }
 
 function updateIndicators(sig, price) {
-  // RSI 14
+  let cards = '';
+
+  // 1. PRICE TREND
+  if (sig.vwap && price) {
+    const rel = price - sig.vwap;
+    const above = rel >= 0;
+    const icon = above ? '📈' : '📉';
+    const verdict = above ? 'Price is ABOVE the average — bullish' : 'Price is BELOW the average — bearish';
+    const cls = above ? 'bull' : 'bear';
+    const explain = above
+      ? `SPY is $${Math.abs(rel).toFixed(2)} above its daily average price (VWAP $${sig.vwap.toFixed(2)}). When price is above average, buyers are in control. Favors CALLS.`
+      : `SPY is $${Math.abs(rel).toFixed(2)} below its daily average price (VWAP $${sig.vwap.toFixed(2)}). When price is below average, sellers are in control. Favors PUTS.`;
+    cards += plainCard(icon, 'Price vs Daily Average', verdict, cls, explain);
+  }
+
+  // 2. MOMENTUM (RSI)
   if (sig.rsi != null) {
     const r = sig.rsi;
-    setInd('ind-rsi', r.toFixed(1),
-      r < 35 ? 'bull' : r > 65 ? 'bear' : 'neut',
-      'ind-rsi-sig',
-      r < 35 ? 'Oversold → CALL setup' : r > 65 ? 'Overbought → PUT setup' : 'Neutral zone',
-      r < 35 ? 'bull' : r > 65 ? 'bear' : 'neut');
+    let icon, verdict, cls, explain;
+    if (r < 35) {
+      icon = '🔥'; cls = 'bull';
+      verdict = 'SPY is OVERSOLD — bounce likely';
+      explain = `RSI is ${r.toFixed(0)} — anything under 35 means the market has been sold off too hard and a bounce UP is likely. Good setup to BUY a CALL.`;
+    } else if (r > 65) {
+      icon = '🥶'; cls = 'bear';
+      verdict = 'SPY is OVERBOUGHT — pullback likely';
+      explain = `RSI is ${r.toFixed(0)} — anything over 65 means the market has been bought up too fast and a drop is likely. Good setup to BUY a PUT.`;
+    } else {
+      icon = '😐'; cls = 'neut';
+      verdict = 'Momentum is neutral — no edge yet';
+      explain = `RSI is ${r.toFixed(0)} — sitting in the middle. No clear push up or down from momentum alone. Wait for a stronger signal.`;
+    }
+    cards += plainCard(icon, 'Momentum (How tired is the move?)', verdict, cls, explain);
   }
 
-  // RSI 5
-  if (sig.rsi5 != null) {
-    const r = sig.rsi5;
-    setInd('ind-rsi5', r.toFixed(1),
-      r < 25 ? 'bull' : r > 75 ? 'bear' : 'neut',
-      'ind-rsi5-sig',
-      r < 25 ? 'Extreme oversold' : r > 75 ? 'Extreme overbought' : 'Neutral',
-      r < 25 ? 'bull' : r > 75 ? 'bear' : 'neut');
-  }
-
-  // EMA 9/21
+  // 3. TREND DIRECTION (EMA)
   if (sig.ema9 && sig.ema21) {
-    const diff = sig.ema9 - sig.ema21;
-    setInd('ind-ema', (diff >= 0 ? '+' : '') + diff.toFixed(3),
-      sig.emaBull ? 'bull' : 'bear',
-      'ind-ema-sig',
-      sig.emaBull ? '9 > 21 — bullish' : '9 < 21 — bearish',
-      sig.emaBull ? 'bull' : 'bear');
+    const bull = sig.emaBull;
+    const cross = sig.type !== 'wait' && sig.reasons && sig.reasons.some(r => r.includes('crossed'));
+    const icon = bull ? '🟢' : '🔴';
+    const verdict = bull ? 'Short-term trend is UP' : 'Short-term trend is DOWN';
+    const cls = bull ? 'bull' : 'bear';
+    const extra = cross ? ' ⚡ Just crossed — strongest signal!' : '';
+    const explain = bull
+      ? `The fast moving average just crossed above the slow one — price has been rising consistently over the last 9 minutes vs the last 21 minutes.${extra} Favors CALLS.`
+      : `The fast moving average just crossed below the slow one — price has been falling consistently.${extra} Favors PUTS.`;
+    cards += plainCard(icon, 'Trend Direction (Which way is it moving?)', verdict, cls, explain);
   }
 
-  // MACD
+  // 4. MACD - momentum shift
   if (sig.macd) {
     const m = sig.macd;
-    const histStr = (m.hist >= 0 ? '+' : '') + m.hist.toFixed(4);
-    setInd('ind-macd', histStr,
-      m.crossUp ? 'bull' : m.crossDown ? 'bear' : m.bullish ? 'bull' : 'bear',
-      'ind-macd-sig',
-      m.crossUp ? '⚡ Bullish crossover' : m.crossDown ? '⚡ Bearish crossover' : m.bullish ? 'Above signal' : 'Below signal',
-      m.crossUp || m.bullish ? 'bull' : 'bear');
+    let icon, verdict, cls, explain;
+    if (m.crossUp) {
+      icon = '⚡'; cls = 'bull';
+      verdict = 'Momentum just TURNED UP — fresh buy signal';
+      explain = 'MACD just crossed bullish — this means the buying pressure just overtook the selling pressure. One of the most reliable reversal signals. Favors CALLS.';
+    } else if (m.crossDown) {
+      icon = '⚡'; cls = 'bear';
+      verdict = 'Momentum just TURNED DOWN — fresh sell signal';
+      explain = 'MACD just crossed bearish — selling pressure just overtook buying pressure. Fresh reversal signal. Favors PUTS.';
+    } else if (m.bullish) {
+      icon = '🟢'; cls = 'bull';
+      verdict = 'Momentum is building upward';
+      explain = 'MACD is above its signal line — buying pressure is stronger than selling pressure right now. Supports CALLS.';
+    } else {
+      icon = '🔴'; cls = 'bear';
+      verdict = 'Momentum is weakening downward';
+      explain = 'MACD is below its signal line — selling pressure is winning right now. Supports PUTS.';
+    }
+    cards += plainCard(icon, 'Momentum Shift (Is the tide turning?)', verdict, cls, explain);
   }
 
-  // Bollinger
-  if (sig.bb) {
+  // 5. PRICE RANGE (Bollinger)
+  if (sig.bb && price) {
     const b = sig.bb;
-    const pos = price <= b.lower ? 'At lower band' : price >= b.upper ? 'At upper band' : 'Inside bands';
-    const cls = price <= b.lower ? 'bull' : price >= b.upper ? 'bear' : 'neut';
-    setInd('ind-bb', '$' + b.lower.toFixed(2) + '–$' + b.upper.toFixed(2),
-      cls, 'ind-bb-sig', pos, cls);
+    let icon, verdict, cls, explain;
+    const range = b.upper - b.lower;
+    if (price <= b.lower) {
+      icon = '🎯'; cls = 'bull';
+      verdict = 'SPY hit the BOTTOM of its range — bounce zone';
+      explain = `Price touched the lower Bollinger Band ($${b.lower.toFixed(2)}). Think of this as a rubber band — when stretched this far down, it usually snaps back up. Strong CALL signal.`;
+    } else if (price >= b.upper) {
+      icon = '🎯'; cls = 'bear';
+      verdict = 'SPY hit the TOP of its range — rejection zone';
+      explain = `Price touched the upper Bollinger Band ($${b.upper.toFixed(2)}). The rubber band is stretched too far up — likely to snap back down. Strong PUT signal.`;
+    } else {
+      const pct = Math.round(((price - b.lower) / range) * 100);
+      icon = '↔️'; cls = 'neut';
+      verdict = `SPY is ${pct}% through its normal range`;
+      explain = `Price is between the bands ($${b.lower.toFixed(2)}–$${b.upper.toFixed(2)}). No extreme to trade off of. The closer to 0% the more bullish, the closer to 100% the more bearish.`;
+    }
+    cards += plainCard(icon, 'Price Range (Is SPY stretched?)', verdict, cls, explain);
   }
 
-  // ROC
-  if (sig.roc != null) {
-    const r = sig.roc;
-    setInd('ind-roc', (r >= 0 ? '+' : '') + r.toFixed(2) + '%',
-      r > 0.3 ? 'bull' : r < -0.3 ? 'bear' : 'neut',
-      'ind-roc-sig',
-      r > 0.3 ? 'Positive momentum' : r < -0.3 ? 'Negative momentum' : 'Flat',
-      r > 0.3 ? 'bull' : r < -0.3 ? 'bear' : 'neut');
-  }
-
-  // ORB
-  if (sig.orb) {
+  // 6. OPENING RANGE BREAKOUT
+  if (sig.orb && price) {
     const o = sig.orb;
-    const priceAbove = price > o.high;
-    const priceBelow = price < o.low;
-    setInd('ind-orb', '$' + o.low.toFixed(2) + '–$' + o.high.toFixed(2),
-      priceAbove ? 'bull' : priceBelow ? 'bear' : 'neut',
-      'ind-orb-sig',
-      priceAbove ? '⚡ Above OR high — bullish' : priceBelow ? '⚡ Below OR low — bearish' : 'Inside opening range',
-      priceAbove ? 'bull' : priceBelow ? 'bear' : 'neut');
+    const above = price > o.high;
+    const below = price < o.low;
+    let icon, verdict, cls, explain;
+    if (above) {
+      icon = '🚀'; cls = 'bull';
+      verdict = 'Broke OUT above the opening range — bullish';
+      explain = `SPY broke above $${o.high.toFixed(2)}, which was the highest price in the first 15 minutes. Breakouts above the opening high are one of the most reliable intraday CALL signals.`;
+    } else if (below) {
+      icon = '💣'; cls = 'bear';
+      verdict = 'Broke DOWN below the opening range — bearish';
+      explain = `SPY broke below $${o.low.toFixed(2)}, which was the lowest price in the first 15 minutes. Breakdowns below the opening low are a reliable intraday PUT signal.`;
+    } else {
+      icon = '⏸️'; cls = 'neut';
+      verdict = 'Still inside the opening range — no breakout yet';
+      explain = `Opening range: $${o.low.toFixed(2)}–$${o.high.toFixed(2)}. SPY is still between these levels. Wait for a clean break above or below before trading the ORB signal.`;
+    }
+    cards += plainCard(icon, 'Opening Range Breakout (Big move signal)', verdict, cls, explain);
   }
 
-  // Volume
+  // 7. VOLUME
   if (sig.volRatio !== undefined) {
     const v = sig.volRatio;
-    setInd('ind-vol', v.toFixed(2) + '×',
-      v > 1.5 ? 'bull' : 'neut',
-      'ind-vol-sig',
-      v > 2.5 ? 'Extreme volume spike!' : v > 1.5 ? 'High — signal confirmed' : v > 1.2 ? 'Moderate' : 'Low — use caution',
-      v > 1.5 ? 'bull' : 'neut');
+    let icon, verdict, cls, explain;
+    if (v > 2.5) {
+      icon = '🔊'; cls = 'bull';
+      verdict = `Huge volume — ${v.toFixed(1)}× normal`;
+      explain = `Trading volume right now is ${v.toFixed(1)} times higher than average. This means big money is actively moving. Whatever direction the signal points, it has institutional backing.`;
+    } else if (v > 1.5) {
+      icon = '📢'; cls = 'bull';
+      verdict = `High volume — ${v.toFixed(1)}× normal — signal confirmed`;
+      explain = `Volume is ${v.toFixed(1)}× the recent average. Signals with high volume behind them are more reliable — the move has real buyers or sellers behind it.`;
+    } else if (v > 1.2) {
+      icon = '🔉'; cls = 'neut';
+      verdict = `Moderate volume — ${v.toFixed(1)}× normal`;
+      explain = 'Volume is slightly above average. Signal is OK but not as strong as it would be with higher volume confirmation.';
+    } else {
+      icon = '🔈'; cls = 'neut';
+      verdict = 'Low volume — treat signals cautiously';
+      explain = `Volume is only ${v.toFixed(1)}× the average — below normal. Low volume moves are easily reversed. Be extra careful and consider waiting for volume to pick up.`;
+    }
+    cards += plainCard(icon, 'Volume (Is real money moving?)', verdict, cls, explain);
   }
 
-  // Candle pattern
-  if (sig.candle) {
-    const row = document.getElementById('ind-candle-row');
-    if (row) row.style.display = 'block';
-    const cls = sig.candle.dir === 'bull' ? 'bull' : sig.candle.dir === 'bear' ? 'bear' : 'neut';
-    setInd('ind-candle', sig.candle.name, cls,
-      'ind-candle-sig',
-      sig.candle.dir === 'bull' ? '→ Bullish reversal signal' : sig.candle.dir === 'bear' ? '→ Bearish reversal signal' : '→ Indecision',
-      cls);
+  // 8. CANDLE PATTERN
+  if (sig.candle && sig.candle.dir !== 'neut') {
+    const bull = sig.candle.dir === 'bull';
+    const icon = bull ? '🕯️' : '🕯️';
+    const verdict = bull ? `${sig.candle.name} — reversal UP signal` : `${sig.candle.name} — reversal DOWN signal`;
+    const cls = bull ? 'bull' : 'bear';
+    const explain = bull
+      ? `The last candle formed a ${sig.candle.name} pattern — this is a classic reversal signal that price is about to move UP. Adds confidence to a CALL trade.`
+      : `The last candle formed a ${sig.candle.name} pattern — this is a classic reversal signal that price is about to move DOWN. Adds confidence to a PUT trade.`;
+    cards += plainCard(icon, 'Candle Pattern (What is price action saying?)', verdict, cls, explain);
   }
 
-  // VWAP bar
-  if (sig.vwap && price) {
-    document.getElementById('vwap-val').textContent = '$' + sig.vwap.toFixed(2);
-    const rel = price - sig.vwap;
-    document.getElementById('vwap-rel').textContent = (rel >= 0 ? '+' : '') + rel.toFixed(2) + ' (' + (rel >= 0 ? 'above' : 'below') + ')';
-    const pct = Math.max(5, Math.min(95, 50 + (rel / 2) * 50));
-    const fill = document.getElementById('vwap-bar-fill');
-    fill.style.width = pct + '%';
-    fill.style.background = rel >= 0 ? '#00c853' : '#ff5252';
-  }
+  document.getElementById('plain-indicators').innerHTML = cards || '<div style="color:#555;font-size:12px;padding:12px">Loading indicator data…</div>';
 }
 
-function buildStrikeTable(sig, price, direction) {
-  // Generate 5 strike options: 2 ITM, ATM, 2 OTM
-  // Confidence based on moneyness + signal strength
-  const maxScore = 9;
-  const baseConf = Math.min(0.92, Math.max(0.35, sig.strength / maxScore));
-  const color = direction === 'call' ? '#00c853' : '#ff5252';
+function buildTradeCard(sig, price, direction) {
+  const color  = direction === 'call' ? '#00c853' : '#ff5252';
+  const colorDim = direction === 'call' ? '#00c85322' : '#ff525222';
+  const expiryShort = new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  const typeWord = direction === 'call' ? 'Call' : 'Put';
 
-  const offsets = direction === 'call'
+  // Recommended strike
+  const recStrike = sig.veryStrong
+    ? (direction === 'call' ? Math.round(price) - 2 : Math.round(price) + 2)  // 2 ITM — very strong
+    : sig.strong
+      ? (direction === 'call' ? Math.round(price) - 1 : Math.round(price) + 1)  // 1 ITM — strong
+      : Math.round(price);  // ATM — normal
+
+  // Estimate option price for ATM 0DTE (~0.5–1.5% of SPY price, rough Black-Scholes approximation)
+  // ATM 0DTE ≈ 0.4 × ATR. We use targetMove/2.5 as proxy for ATR if available
+  const atrProxy = sig.atr || (parseFloat(sig.targetMove) / 2.5) || 0.45;
+  const estOptPrice = Math.max(0.20, (atrProxy * 0.40)).toFixed(2);
+  const estTarget   = (parseFloat(estOptPrice) * 2.0).toFixed(2);   // 100% gain target
+  const estStop     = (parseFloat(estOptPrice) * 0.50).toFixed(2);  // 50% loss stop
+
+  const strikes = direction === 'call'
     ? [
-        { delta: +2, label: '2 ITM',  riskLabel: 'Lower risk',   confMult: 0.72, note: 'Safest · highest delta' },
-        { delta: +1, label: '1 ITM',  riskLabel: 'Low risk',     confMult: 0.88, note: 'Good balance · high delta' },
-        { delta:  0, label: 'ATM',    riskLabel: 'Moderate',     confMult: 1.00, note: 'Best signal match · ~0.50Δ' },
-        { delta: -1, label: '1 OTM',  riskLabel: 'Higher risk',  confMult: 0.78, note: 'Cheaper · needs bigger move' },
-        { delta: -2, label: '2 OTM',  riskLabel: 'Aggressive',   confMult: 0.55, note: 'Lottery ticket · needs +$2 move' },
+        { strike: Math.round(price)-2, label:'2 ITM', risk:'🟢 Safest',    why:'Costs more upfront. Moves almost 1:1 with SPY. Best if you want the lowest risk.' },
+        { strike: Math.round(price)-1, label:'1 ITM', risk:'🟡 Balanced',  why:'Good mix of cost and movement. Go here on strong signals.' },
+        { strike: Math.round(price),   label:'ATM',   why:'The sweet spot for most signals. Best value for your money.', risk:'🟡 Standard', rec:true },
+        { strike: Math.round(price)+1, label:'1 OTM', risk:'🔴 Risky',     why:'Cheaper, but SPY needs to move at least $1 more before you profit.' },
+        { strike: Math.round(price)+2, label:'2 OTM', risk:'🔴 Aggressive',why:'Very cheap. Needs a +$2 SPY move. High risk, high reward.' },
       ]
     : [
-        { delta: -2, label: '2 ITM',  riskLabel: 'Lower risk',   confMult: 0.72, note: 'Safest · highest delta' },
-        { delta: -1, label: '1 ITM',  riskLabel: 'Low risk',     confMult: 0.88, note: 'Good balance · high delta' },
-        { delta:  0, label: 'ATM',    riskLabel: 'Moderate',     confMult: 1.00, note: 'Best signal match · ~0.50Δ' },
-        { delta: +1, label: '1 OTM',  riskLabel: 'Higher risk',  confMult: 0.78, note: 'Cheaper · needs bigger move' },
-        { delta: +2, label: '2 OTM',  riskLabel: 'Aggressive',   confMult: 0.55, note: 'Lottery ticket · needs -$2 move' },
+        { strike: Math.round(price)+2, label:'2 ITM', risk:'🟢 Safest',    why:'Costs more upfront. Moves almost 1:1 with SPY. Best if you want the lowest risk.' },
+        { strike: Math.round(price)+1, label:'1 ITM', risk:'🟡 Balanced',  why:'Good mix of cost and movement. Go here on strong signals.' },
+        { strike: Math.round(price),   label:'ATM',   why:'The sweet spot for most signals. Best value for your money.', risk:'🟡 Standard', rec:true },
+        { strike: Math.round(price)-1, label:'1 OTM', risk:'🔴 Risky',     why:'Cheaper, but SPY needs to move at least $1 more before you profit.' },
+        { strike: Math.round(price)-2, label:'2 OTM', risk:'🔴 Aggressive',why:'Very cheap. Needs a -$2 SPY move. High risk, high reward.' },
       ];
 
-  const rows = offsets.map((o, i) => {
-    const strike = Math.round(price) + o.delta;
-    const conf = Math.round(baseConf * o.confMult * 100);
-    const isATM = o.delta === 0;
-    const barColor = isATM ? color : (conf > 70 ? color : conf > 50 ? '#888' : '#444');
-    return `
-      <div class="strike-row" style="border:1px solid ${isATM ? color+'55' : '#222'}">
-        <div class="conf-bar" style="width:${conf}%;background:${color}"></div>
-        <div class="sr-label" style="color:#666">${o.label}</div>
-        <div class="sr-strike" style="color:${isATM ? color : '#ddd'}">$${strike}</div>
-        <div class="sr-bar-wrap"><div class="sr-bar" style="width:${conf}%;background:${barColor}"></div></div>
-        <div class="sr-conf">
-          <div class="sr-pct" style="color:${conf >= 70 ? color : conf >= 50 ? '#aaa' : '#555'}">${conf}%</div>
-          <div class="sr-desc">${o.note}</div>
-        </div>
-      </div>`;
-  });
+  const recRow = strikes.find(s => sig.veryStrong ? s.label==='2 ITM' : sig.strong ? s.label==='1 ITM' : s.label==='ATM') || strikes[2];
+  const recS = recRow.strike;
 
-  const expiry = new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'});
-  return `<div class="strikes-title">Strike Options · ${direction.toUpperCase()} · Exp ${expiry}</div>` + rows.join('');
+  // ── SECTION 1: THE TRADE ──
+  let html = `
+  <div style="background:#0a0a0a;border:2px solid ${color}55;border-radius:14px;padding:18px;margin-top:10px">
+    <div style="font-size:11px;color:${color};text-transform:uppercase;letter-spacing:.1em;font-weight:700;margin-bottom:14px">✅ YOUR TRADE</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+      <div style="background:#111;border-radius:10px;padding:12px;text-align:center">
+        <div style="font-size:10px;color:#555;text-transform:uppercase;margin-bottom:4px">What to buy</div>
+        <div style="font-size:18px;font-weight:900;color:${color}">SPY ${typeWord.toUpperCase()}</div>
+        <div style="font-size:11px;color:#888;margin-top:2px">1 contract = 100 shares</div>
+      </div>
+      <div style="background:#111;border-radius:10px;padding:12px;text-align:center">
+        <div style="font-size:10px;color:#555;text-transform:uppercase;margin-bottom:4px">Expiry</div>
+        <div style="font-size:18px;font-weight:900;color:#fff">${expiryShort}</div>
+        <div style="font-size:11px;color:#888;margin-top:2px">Today only (0DTE)</div>
+      </div>
+    </div>
+
+    <div style="background:#111;border:2px solid ${color};border-radius:12px;padding:14px;text-align:center;margin-bottom:14px">
+      <div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">Best Strike to Buy</div>
+      <div style="font-size:36px;font-weight:900;color:${color}">$${recS}</div>
+      <div style="font-size:12px;color:#aaa;margin-top:2px">${recRow.label} — ${recRow.why}</div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:6px">
+      <div style="background:#111;border-radius:10px;padding:10px;text-align:center">
+        <div style="font-size:9px;color:#555;text-transform:uppercase;margin-bottom:3px">Est. Option Cost</div>
+        <div style="font-size:16px;font-weight:800;color:#fff">~$${estOptPrice}</div>
+        <div style="font-size:9px;color:#555;margin-top:2px">per share</div>
+        <div style="font-size:10px;color:#aaa;margin-top:1px">~$${(parseFloat(estOptPrice)*100).toFixed(0)} total</div>
+      </div>
+      <div style="background:#00c85315;border:1px solid #00c85344;border-radius:10px;padding:10px;text-align:center">
+        <div style="font-size:9px;color:#00c853;text-transform:uppercase;margin-bottom:3px">🎯 Sell at</div>
+        <div style="font-size:16px;font-weight:800;color:#00c853">$${estTarget}</div>
+        <div style="font-size:9px;color:#555;margin-top:2px">per share</div>
+        <div style="font-size:10px;color:#00c853;margin-top:1px">+100% profit</div>
+      </div>
+      <div style="background:#ff525215;border:1px solid #ff525244;border-radius:10px;padding:10px;text-align:center">
+        <div style="font-size:9px;color:#ff5252;text-transform:uppercase;margin-bottom:3px">🛑 Exit if</div>
+        <div style="font-size:16px;font-weight:800;color:#ff5252">$${estStop}</div>
+        <div style="font-size:9px;color:#555;margin-top:2px">per share</div>
+        <div style="font-size:10px;color:#ff5252;margin-top:1px">-50% loss</div>
+      </div>
+    </div>
+    <div style="font-size:10px;color:#444;text-align:center;margin-bottom:14px">
+      ↑ These are option prices (what you see in Tastytrade), not SPY prices.<br>SPY target: <span style="color:#00c853">$${sig.targetSPY}</span> &nbsp;·&nbsp; SPY stop: <span style="color:#ff5252">$${sig.stopSPY}</span>
+    </div>
+
+    <div style="background:#ff525210;border:1px solid #ff525233;border-radius:10px;padding:10px 12px;margin-bottom:4px">
+      <div style="font-size:12px;font-weight:700;color:#ff5252;margin-bottom:6px">⏰ MUST SELL BEFORE 3:45 PM ET</div>
+      <div style="font-size:12px;color:#aaa;line-height:1.6">0DTE options lose value extremely fast in the last 15 minutes. Even if the trade is going your way — <strong style="color:#fff">sell by 3:45 PM no matter what.</strong></div>
+    </div>
+  </div>`;
+
+  // ── SECTION 2: OTHER STRIKES ──
+  html += `<div style="font-size:11px;color:#555;text-transform:uppercase;letter-spacing:.07em;margin:16px 0 8px">Other Strike Options</div>`;
+  html += strikes.map(s => {
+    const isRec = sig.veryStrong ? s.label==='2 ITM' : sig.strong ? s.label==='1 ITM' : s.label==='ATM';
+    return `<div style="background:${isRec ? colorDim : 'transparent'};border:1px solid ${isRec ? color+'44' : '#1e1e1e'};border-radius:10px;padding:10px 13px;margin-bottom:6px;display:flex;align-items:center;gap:10px">
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:7px">
+          <span style="color:${color};font-weight:800;font-size:16px">$${s.strike}</span>
+          <span style="font-size:11px;color:#555">${s.label}</span>
+          ${isRec ? `<span style="background:${color};color:#000;font-size:9px;font-weight:700;padding:2px 7px;border-radius:100px">RECOMMENDED</span>` : ''}
+        </div>
+        <div style="font-size:11px;color:#666;margin-top:3px">${s.why}</div>
+      </div>
+      <div style="font-size:11px;color:#666;flex-shrink:0">${s.risk}</div>
+    </div>`;
+  }).join('');
+
+  // ── SECTION 3: HOW TO BUY ──
+  const step = (n, text) => `
+    <div style="display:flex;gap:10px;margin-bottom:11px;align-items:flex-start">
+      <div style="background:${color};color:#000;font-weight:800;font-size:11px;min-width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">${n}</div>
+      <div style="font-size:13px;color:#ccc;line-height:1.5">${text}</div>
+    </div>`;
+
+  html += `
+  <div style="background:#111;border-radius:14px;padding:16px 18px;margin-top:6px">
+    <div style="font-size:13px;font-weight:800;color:#fff;margin-bottom:14px">📱 How to place this trade on Tastytrade</div>
+    ${step(1, 'Open the <strong style="color:#fff">Tastytrade</strong> app')}
+    ${step(2, 'Tap the <strong style="color:#fff">Search</strong> bar → type <strong style="color:#fff">SPY</strong> → tap it')}
+    ${step(3, 'Tap <strong style="color:#fff">Trade</strong> at the bottom → then <strong style="color:#fff">Options</strong>')}
+    ${step(4, 'Tap the expiry date <strong style="color:#fff">${expiryShort}</strong> — it may show as <strong style="color:#fff">0DTE</strong>')}
+    ${step(5, `Scroll to strike <strong style="color:${color};font-size:15px">$${recS}</strong> → tap the <strong style="color:#fff">${typeWord}</strong> side (right column)`)}
+    ${step(6, 'Tap <strong style="color:#fff">Buy to Open</strong>')}
+    ${step(7, 'Change order type to <strong style="color:#fff">Limit</strong> — set the price to the <strong style="color:#fff">Ask price</strong> shown. Never use Market.')}
+    ${step(8, 'Set quantity: <strong style="color:#fff">1 contract</strong>')}
+    ${step(9, 'Tap <strong style="color:#fff">Review Order</strong> → then <strong style="color:#fff">Send</strong>')}
+
+    <div style="background:#1a1a1a;border-radius:10px;padding:12px 14px;margin-top:4px">
+      <div style="font-size:12px;font-weight:700;color:#fff;margin-bottom:8px">Once you're in the trade</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div style="background:#00c85315;border-radius:8px;padding:10px;text-align:center">
+          <div style="font-size:10px;color:#00c853;font-weight:700;margin-bottom:3px">TAKE PROFIT WHEN OPTION HITS</div>
+          <div style="font-size:20px;font-weight:900;color:#00c853">$${estTarget}</div>
+          <div style="font-size:10px;color:#555;margin-top:2px">Tap Sell to Close</div>
+        </div>
+        <div style="background:#ff525215;border-radius:8px;padding:10px;text-align:center">
+          <div style="font-size:10px;color:#ff5252;font-weight:700;margin-bottom:3px">CUT LOSS WHEN OPTION HITS</div>
+          <div style="font-size:20px;font-weight:900;color:#ff5252">$${estStop}</div>
+          <div style="font-size:10px;color:#555;margin-top:2px">Tap Sell to Close</div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:#555;text-align:center;margin-top:8px">Go to <strong style="color:#aaa">Positions</strong> tab → tap your SPY option → tap <strong style="color:#aaa">Close Position</strong></div>
+    </div>
+  </div>`;
+
+  return html;
 }
 
 function updateSignalBox(sig, price) {
@@ -971,24 +1266,30 @@ function updateSignalBox(sig, price) {
   if (sig.type === 'call') {
     typeEl.textContent = '📈 BUY CALL';
     typeEl.className = 'sig-type call';
-    badgeEl.textContent = sig.strong ? '⚡ STRONG SIGNAL' : `${sig.confPct || 0}% confidence`;
-    badgeEl.className = sig.strong ? 'sig-badge strong' : 'sig-badge call';
+    badgeEl.textContent = sig.veryStrong ? '🔥 VERY STRONG' : sig.strong ? '⚡ STRONG SIGNAL' : `${sig.confPct || 0}% confidence`;
+    badgeEl.className = sig.veryStrong ? 'sig-badge very-strong' : sig.strong ? 'sig-badge strong' : 'sig-badge call';
 
     bodyEl.innerHTML = `
-      <div style="margin-bottom:12px">
-        <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-          <span style="font-size:10px;color:#555">Signal Strength</span>
-          <span style="font-size:10px;color:#00c853">${sig.strength || 0} / ${sig.maxScore || 20} pts · ${sig.confPct || 0}% confidence</span>
+      <div style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+          <span style="font-size:11px;color:#555">Signal Strength</span>
+          <span style="font-size:11px;color:#00c853">${sig.strength || 0} / ${sig.maxScore || 20} pts</span>
         </div>
-        <div style="background:#111;border-radius:4px;height:6px">
-          <div style="height:6px;border-radius:4px;background:linear-gradient(90deg,#00c853,#69f0ae);width:${Math.round(((sig.strength||0)/(sig.maxScore||20))*100)}%;transition:width .5s"></div>
+        <div style="background:#111;border-radius:6px;height:10px;position:relative">
+          <div style="height:10px;border-radius:6px;background:${sig.veryStrong ? 'linear-gradient(90deg,#ffd600,#ff6d00)' : 'linear-gradient(90deg,#00c853,#69f0ae)'};width:${Math.round(((sig.strength||0)/(sig.maxScore||20))*100)}%;transition:width .5s"></div>
         </div>
+        <div style="display:flex;justify-content:space-between;margin-top:5px">
+          <span style="font-size:10px;color:#333">Weak</span>
+          <span style="font-size:10px;color:#555">Strong</span>
+          <span style="font-size:10px;color:#ffd600">Very Strong</span>
+        </div>
+        ${sig.veryStrong ? `<div style="margin-top:8px;background:linear-gradient(90deg,#ffd60022,#ff6d0022);border:1px solid #ffd60055;border-radius:8px;padding:8px 12px;font-size:13px;color:#ffd600;font-weight:700">🔥 All systems go — this is the strongest setup possible. High confidence trade.</div>` : sig.strong ? `<div style="margin-top:8px;background:#00c85315;border:1px solid #00c85333;border-radius:8px;padding:8px 12px;font-size:13px;color:#00c853;font-weight:700">⚡ Strong signal — multiple indicators aligned. Good trade.</div>` : `<div style="margin-top:8px;background:#ffffff08;border-radius:8px;padding:8px 12px;font-size:12px;color:#888">${sig.confPct || 0}% confidence — signal is valid but not all indicators agree. Trade smaller.</div>`}
       </div>
       <div class="strike-box">
         <div>
           <div class="strike-label">Recommended Strike</div>
           <div class="strike-val">SPY $${sig.strike} CALL</div>
-          <div class="strike-detail">0DTE · ATM or 1 strike ITM</div>
+          <div class="strike-detail">Today · expires at market close</div>
         </div>
         <div style="text-align:right">
           <div class="strike-label">Expiry</div>
@@ -1011,30 +1312,36 @@ function updateSignalBox(sig, price) {
         </div>
       </div>
     `;
-    bodyEl.innerHTML += buildStrikeTable(sig, parseFloat(sig.entryPrice), 'call');
+    bodyEl.innerHTML += buildTradeCard(sig, parseFloat(sig.entryPrice), 'call');
     reasonEl.innerHTML = '<span>Why:</span> ' + sig.reasons.join(' · ');
 
   } else if (sig.type === 'put') {
     typeEl.textContent = '📉 BUY PUT';
     typeEl.className = 'sig-type put';
-    badgeEl.textContent = sig.strong ? '⚡ STRONG SIGNAL' : `${sig.confPct || 0}% confidence`;
-    badgeEl.className = sig.strong ? 'sig-badge strong-put' : 'sig-badge put';
+    badgeEl.textContent = sig.veryStrong ? '🔥 VERY STRONG' : sig.strong ? '⚡ STRONG SIGNAL' : `${sig.confPct || 0}% confidence`;
+    badgeEl.className = sig.veryStrong ? 'sig-badge very-strong-put' : sig.strong ? 'sig-badge strong-put' : 'sig-badge put';
 
     bodyEl.innerHTML = `
-      <div style="margin-bottom:12px">
-        <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-          <span style="font-size:10px;color:#555">Signal Strength</span>
-          <span style="font-size:10px;color:#ff5252">${sig.strength || 0} / ${sig.maxScore || 20} pts · ${sig.confPct || 0}% confidence</span>
+      <div style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+          <span style="font-size:11px;color:#555">Signal Strength</span>
+          <span style="font-size:11px;color:#ff5252">${sig.strength || 0} / ${sig.maxScore || 20} pts</span>
         </div>
-        <div style="background:#111;border-radius:4px;height:6px">
-          <div style="height:6px;border-radius:4px;background:linear-gradient(90deg,#ff5252,#ff8a80);width:${Math.round(((sig.strength||0)/(sig.maxScore||20))*100)}%;transition:width .5s"></div>
+        <div style="background:#111;border-radius:6px;height:10px;position:relative">
+          <div style="height:10px;border-radius:6px;background:${sig.veryStrong ? 'linear-gradient(90deg,#ffd600,#ff6d00)' : 'linear-gradient(90deg,#ff5252,#ff8a80)'};width:${Math.round(((sig.strength||0)/(sig.maxScore||20))*100)}%;transition:width .5s"></div>
         </div>
+        <div style="display:flex;justify-content:space-between;margin-top:5px">
+          <span style="font-size:10px;color:#333">Weak</span>
+          <span style="font-size:10px;color:#555">Strong</span>
+          <span style="font-size:10px;color:#ffd600">Very Strong</span>
+        </div>
+        ${sig.veryStrong ? `<div style="margin-top:8px;background:linear-gradient(90deg,#ffd60022,#ff6d0022);border:1px solid #ffd60055;border-radius:8px;padding:8px 12px;font-size:13px;color:#ffd600;font-weight:700">🔥 All systems go — this is the strongest setup possible. High confidence trade.</div>` : sig.strong ? `<div style="margin-top:8px;background:#ff525215;border:1px solid #ff525233;border-radius:8px;padding:8px 12px;font-size:13px;color:#ff5252;font-weight:700">⚡ Strong signal — multiple indicators aligned. Good trade.</div>` : `<div style="margin-top:8px;background:#ffffff08;border-radius:8px;padding:8px 12px;font-size:12px;color:#888">${sig.confPct || 0}% confidence — signal is valid but not all indicators agree. Trade smaller.</div>`}
       </div>
       <div class="strike-box">
         <div>
           <div class="strike-label">Recommended Strike</div>
           <div class="strike-val">SPY $${sig.strike} PUT</div>
-          <div class="strike-detail">0DTE · ATM or 1 strike ITM</div>
+          <div class="strike-detail">Today · expires at market close</div>
         </div>
         <div style="text-align:right">
           <div class="strike-label">Expiry</div>
@@ -1057,7 +1364,7 @@ function updateSignalBox(sig, price) {
         </div>
       </div>
     `;
-    bodyEl.innerHTML += buildStrikeTable(sig, parseFloat(sig.entryPrice), 'put');
+    bodyEl.innerHTML += buildTradeCard(sig, parseFloat(sig.entryPrice), 'put');
     reasonEl.innerHTML = '<span>Why:</span> ' + sig.reasons.join(' · ');
 
   } else {
