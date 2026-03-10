@@ -708,13 +708,20 @@ async function fetchData() {
   if (!apiKey) return;
   secondsUntilRefresh = 60;
 
+  // Don't even attempt API call if market is closed
+  if (!isMarketOpen()) {
+    showMarketClosed();
+    document.getElementById('status-dot').className = 'status-dot closed';
+    document.getElementById('market-status-text').textContent = 'Market closed';
+    return;
+  }
+
   const dot = document.getElementById('status-dot');
   dot.className = 'status-dot loading';
 
   try {
     const today = todayStr();
 
-    // Get last 120 1-minute bars
     const from = today;
     const to = today;
     const url = `${API_BASE}/v2/aggs/ticker/SPY/range/1/minute/${from}/${to}?adjusted=true&sort=asc&limit=200&apiKey=${apiKey}`;
