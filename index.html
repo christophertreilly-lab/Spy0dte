@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
   <meta name="apple-mobile-web-app-title" content="SPY 0DTE"/>
   <meta name="theme-color" content="#0d0d0d"/>
-  <link rel="manifest" href="manifest.json"/>
+  <link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIlNQWSAwRFRFIFNpZ25hbHMiLAogICJzaG9ydF9uYW1lIjogIlNQWSAwRFRFIiwKICAiZGVzY3JpcHRpb24iOiAiUmVhbC10aW1lIFNQWSAwRFRFIG9wdGlvbnMgc2lnbmFsIGFwcCIsCiAgInN0YXJ0X3VybCI6ICIvc3B5MGR0ZS8iLAogICJzY29wZSI6ICIvc3B5MGR0ZS8iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMwZDBkMGQiLAogICJ0aGVtZV9jb2xvciI6ICIjMGQwZDBkIiwKICAib3JpZW50YXRpb24iOiAicG9ydHJhaXQiCn0="/>
   <title>SPY 0DTE Signals</title>
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
@@ -1477,8 +1477,99 @@ function startAutoRefresh() {
   }, 1000);
 }
 
+// ── NOTIFICATIONS ──
+function registerServiceWorker() {
+  // No external SW file needed — notifications work via direct API
+}
+
+function updateNotifUI() {
+  const btn = document.getElementById('notif-btn');
+  const status = document.getElementById('notif-status');
+  if (!btn || !status) return;
+  const perm = ('Notification' in window) ? Notification.permission : 'unsupported';
+  if (perm === 'granted') {
+    btn.textContent = '✅ Notifications ON';
+    btn.style.background = '#1a1a1a';
+    btn.style.color = '#00c853';
+    btn.style.border = '1px solid #00c85344';
+    btn.onclick = null;
+    status.textContent = 'You will be notified on ⚡ Strong and 🔥 Very Strong signals.';
+    status.style.color = '#00c853';
+  } else if (perm === 'denied') {
+    btn.textContent = '🚫 Blocked — enable in Settings';
+    btn.style.background = '#1a1a1a';
+    btn.style.color = '#ff5252';
+    btn.onclick = null;
+    status.textContent = 'Go to Settings → Safari → tap this site → Notifications → Allow.';
+    status.style.color = '#ff5252';
+  } else if (perm === 'unsupported') {
+    btn.textContent = '❌ Not supported';
+    btn.style.background = '#1a1a1a';
+    btn.style.color = '#555';
+    btn.onclick = null;
+    status.textContent = 'Use Safari and add to Home Screen for notifications.';
+  } else {
+    btn.textContent = 'Enable Notifications';
+    btn.style.background = '#00c853';
+    btn.style.color = '#000';
+    status.textContent = 'Tap to get alerted when a strong signal fires.';
+    status.style.color = '#888';
+  }
+}
+
+function initNotifications() {
+  const bar = document.getElementById('notif-bar');
+  if (bar) bar.style.display = 'block';
+  updateNotifUI();
+}
+
+async function requestNotifPermission() {
+  if (!('Notification' in window)) {
+    alert('Notifications not supported. Open in Safari and add to Home Screen first.');
+    return;
+  }
+  try {
+    const result = await Notification.requestPermission();
+    updateNotifUI();
+    if (result === 'granted') {
+      setTimeout(() => sendNotification('✅ SPY 0DTE Notifications Active', 'You will be alerted on Strong and Very Strong signals.', 'test'), 600);
+    }
+  } catch(e) {
+    console.log('Notif permission error:', e);
+  }
+}
+
+function sendNotification(title, body, tag) {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  try {
+    new Notification(title, { body, tag: tag || 'spy0dte', requireInteraction: true });
+  } catch(e) {
+    console.log('Notif send error:', e);
+  }
+}
+
+function maybeNotify(sig) {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  if (sig.type === 'wait') return;
+  const dir = sig.type === 'call' ? '📈 BUY CALL' : '📉 BUY PUT';
+  if (sig.veryStrong) {
+    sendNotification(
+      '🔥 VERY STRONG ' + dir,
+      'SPY $' + sig.strike + ' ' + sig.type.toUpperCase() + ' · ' + sig.strength + '/' + sig.maxScore + ' pts · Open Tastytrade now',
+      'very-strong'
+    );
+  } else if (sig.strong) {
+    sendNotification(
+      '⚡ STRONG ' + dir,
+      'SPY $' + sig.strike + ' ' + sig.type.toUpperCase() + ' · ' + sig.strength + '/' + sig.maxScore + ' pts',
+      'strong'
+    );
+  }
+}
+
 // ── INIT ──
 window.addEventListener('DOMContentLoaded', () => {
+  registerServiceWorker();
   const saved = localStorage.getItem('spy0dte_key');
   if (saved) {
     apiKey = saved;
@@ -1486,6 +1577,7 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('key-screen').style.display = 'none';
     document.getElementById('app').style.display = 'block';
     loadHistory();
+    initNotifications();
     fetchData();
     startAutoRefresh();
   }
